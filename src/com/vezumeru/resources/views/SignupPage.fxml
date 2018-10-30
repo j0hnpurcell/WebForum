@@ -18,6 +18,9 @@
                <font>
                   <Font name="DejaVuMathTeXGyre-Regular" size="30.0" />
                </font>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
             </Label>
             <Label prefHeight="25.0" prefWidth="432.0" text="Username" wrapText="true">
                <font>

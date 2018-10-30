@@ -16,6 +16,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class LoginPageController implements Initializable {
+
+    /* Nodes and their fx:id from SceneBuilder*/
     @FXML private Parent root;
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
@@ -30,17 +32,16 @@ public class LoginPageController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         loginMessage.setVisible(false);
     }
-
+    /* Check MySQL Database to see if the user is register */
     private boolean isValidCredentials(String username, String password) {
         /* This is temporary I'll eventually add MySQL possible add some form of password and username encryption? I don't care if it's weak for now*/
         return username.equals(SUPER_SECRET_USERNAME);
     }
-
     private void clearFields() {
         usernameField.setText("");
         passwordField.setText("");
     }
-
+    /* Message changes depending on whether credentials were right or wrong */
     private void displayLoginMessage(boolean isValidCredentials) {
         loginMessage.setVisible(true);
 
@@ -52,7 +53,7 @@ public class LoginPageController implements Initializable {
             loginMessage.setTextFill(Color.RED);
         }
     }
-
+    /* Log the user in if credentials are right*/
     public void loginButtonPressed() {
         String username = usernameField.getText();
         String password = passwordField.getText();
@@ -61,7 +62,7 @@ public class LoginPageController implements Initializable {
         displayLoginMessage(isValidCredentials(username, password));
         clearFields();
     }
-
+    /* Switch scene to SignupPage.xfml */
     public void signUpLinkPressed() throws IOException {
         /* Gets the current window */
         Stage stage = (Stage) root.getScene().getWindow();

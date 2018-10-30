@@ -1,4 +1,4 @@
-/* CREATED SUNDAY OCTOBER 28TH, 2018 (~11:41AM) by Jonathan Purcell */
+/* Created October 28th, 2018 by Jonathan Purcell */
 
 package com.vezumeru.java;
 

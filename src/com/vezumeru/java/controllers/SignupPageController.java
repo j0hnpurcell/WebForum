@@ -10,38 +10,47 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class SignupPageController implements Initializable {
+
+    /* Nodes and their fx:id from SceneBuilder*/
     @FXML private Parent root;
     @FXML private TextField usernameField;
     @FXML private PasswordField firstPasswordField;
     @FXML private PasswordField secondPasswordField;
-    @FXML private Button signup;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
     }
-
     private void clearFields() {
         usernameField.setText("");
         firstPasswordField.setText("");
         secondPasswordField.setText("");
     }
-
+    /* Register user if credentials are valid and criterias are met */
     public void signUpButtonPressed() {
         String username = usernameField.getText();
         String password = firstPasswordField.getText();
         String passwordRepeat = secondPasswordField.getText();
 
-        /* Make sure user doesn't exist */
-        clearFields();
-    }
+        // Will create a function for this later on
+        if (password.equals(passwordRepeat) && password.length() > 0) {
+            System.out.println("Logging in ");
+            /* TODO: Make sure user doesn't exist */
+            clearFields();
+        } else {
+            firstPasswordField.setText("");
+            secondPasswordField.setText("");
+            firstPasswordField.setPromptText("Passwords do not match");
+            secondPasswordField.setPromptText("Passwords do not match");
+        }
 
+    }
+    /* Switch scene to LoginPage.xfml */
     public void loginLinkPressed() throws IOException {
         /* Gets the current window */
         Stage stage = (Stage) root.getScene().getWindow();
