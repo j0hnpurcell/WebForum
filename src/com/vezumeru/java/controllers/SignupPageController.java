@@ -13,43 +13,47 @@ import java.util.ResourceBundle;
 
 public class SignupPageController implements Initializable {
 
-    /* Nodes and their fx:id from SceneBuilder*/
-    @FXML public static Parent signUpPageRoot;
     @FXML private TextField usernameField;
     @FXML private PasswordField firstPasswordField;
     @FXML private PasswordField secondPasswordField;
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-
-    }
-    private void clearFields() {
-        usernameField.setText("");
+    public void initialize(URL url, ResourceBundle resourceBundle) { }
+    private void clearPasswordField(final String PROMPT_MESSAGE) {
         firstPasswordField.setText("");
         secondPasswordField.setText("");
+        firstPasswordField.setPromptText(PROMPT_MESSAGE);
+        secondPasswordField.setPromptText(PROMPT_MESSAGE);
     }
-    /* Register user if credentials are valid and criterias are met */
+    private void registerUserIfCredentialsAreValid(String username, String password, String passwordRepeat) {
+        final int MINIMUM_ALLOWED_CHARACTERS_IN_PASSWORD = 5;
+        if (password.equals(passwordRepeat) && password.length() > MINIMUM_ALLOWED_CHARACTERS_IN_PASSWORD) {
+            if (databaseHandler.userAlreadyExists(username)) {
+                usernameField.setText("User already exists. Try another.");
+                clearPasswordField("");
+            } else {
+                System.out.println("Signing up...");
+                databaseHandler.addUserToTable(username, password);
+
+                // Change the scene to the login page once they have register
+                sceneController.setWindowTitle(sceneController.loginPageTitle);
+                sceneController.setNewScene(sceneController.LOGIN_PAGE_FXML);
+            }
+        } else if (password.length() < MINIMUM_ALLOWED_CHARACTERS_IN_PASSWORD) {
+            clearPasswordField("Password too weak (5 chars. min)");
+        } else {
+            clearPasswordField("Passwords do not match");
+        }
+    }
     public void signUpButtonPressed() {
         String username = usernameField.getText();
         String password = firstPasswordField.getText();
         String passwordRepeat = secondPasswordField.getText();
 
-        // Will create a function for this later on
-        if (password.equals(passwordRepeat) && password.length() > 0) {
-            System.out.println("Signing up succeeded");
-            /* TODO: Make sure user doesn't exist */
-
-            databaseHandler.addUserToTable(username, password);
-            System.out.println();
-            clearFields(); // This or set scene as homepage.. or login idk
-        } else {
-            firstPasswordField.setText("");
-            secondPasswordField.setText("");
-            firstPasswordField.setPromptText("Passwords do not match");
-            secondPasswordField.setPromptText("Passwords do not match");
-        }
-
+        registerUserIfCredentialsAreValid(username, password, passwordRepeat);
     }
-    /* Switch scene to LoginPage.xfml */
-    public void loginLinkPressed()  { sceneController.setNewScene(sceneController.LOGIN_PAGE_FXML); }
+    public void loginLinkPressed()  {
+        sceneController.setWindowTitle(sceneController.loginPageTitle);
+        sceneController.setNewScene(sceneController.LOGIN_PAGE_FXML);
+    }
 }

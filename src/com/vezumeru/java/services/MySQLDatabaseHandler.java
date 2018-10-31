@@ -73,8 +73,7 @@ public class MySQLDatabaseHandler {
             statement.close();
         } catch (SQLException ex) { System.err.println(ex.getMessage()); }
     }
-    // IGNORE FOR NOW.. I'LL IMPLEMENT LATER ON
-    public void removeUserFromTable(final int ID) throws SQLException {
+    public void removeUserFromTable(final int ID) {
         try {
             // TODO Make it to where the user can delete their account if they wish refer to this to help
             // https://stackoverflow.com/questions/8555154/what-is-the-difference-between-drop-and-delete-for-tables
@@ -87,6 +86,43 @@ public class MySQLDatabaseHandler {
             statement.close();
             connection.commit();
         } catch (SQLException ex) { System.err.println(ex.getMessage()); }
+    }
+    public boolean passwordGoesWithEnteredUsername(final String USERNAME, final String PASSWORD) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQL = "SELECT username FROM userCredentials WHERE username='" + USERNAME + "' AND PASSWORD='" + PASSWORD + "'";
+
+            ResultSet resultSet = statement.executeQuery(SQL);
+            String dataFromResultSet = "";
+            while (resultSet.next()) { dataFromResultSet += resultSet.getString("username"); }
+            statement.close();
+
+            // If there's data returned from the query that means a row matching the query was found
+            if (dataFromResultSet.length() > 0) { return true; }
+            else { return false; }
+        } catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+            return false;
+        }
+    }
+    public boolean userAlreadyExists(final String USERNAME) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQL = "SELECT username FROM userCredentials WHERE username='" + USERNAME + "'";
+
+            // This is a quick hacky way to find out if user exists.. I don't know any other way at the moment
+            ResultSet resultSet = statement.executeQuery(SQL);
+            String dataFromResultSet = "";
+            while (resultSet.next()) { dataFromResultSet += resultSet.getString("username"); }
+            statement.close();
+
+            if (dataFromResultSet.length() > 0) { return true; }
+            else { return false; }
+
+        } catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+            return false;
+        }
     }
     private String[] getMySQLLoginCredentialsFromUser() {
         try {
@@ -101,8 +137,7 @@ public class MySQLDatabaseHandler {
     }
 
     // Called when an instance of MySQLDatabaseHandler is created
-    public MySQLDatabaseHandler()
-    {
+    public MySQLDatabaseHandler()  {
         // Table created with
         // CREATE TABLE userCredentials (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255) PRIMARY KEY, password VARCHAR(255));
         // I made it to where the id and username have to be unique. I might change that later on. Duplicate usernames?+
