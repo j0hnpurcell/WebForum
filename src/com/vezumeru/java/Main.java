@@ -1,37 +1,33 @@
 /* Created October 28th, 2018 by Jonathan Purcell */
 
+/* TODO
+ * Refactor some of the code since I'm going to have to keep this maintainable for some bit
+ * I honestly don't know how much I'll update the project. It's more for fun to learn JavaFX, SQL, and Java in general
+ *
+ * Create separate function in the sign up controller for validating fields
+ * Allow users to actually log in
+ * Remove duplicate entries from MySQL (I did primary key.. I honestly don't know why duplicates are being allowed)
+ * Make it so where not the full path is included in the sceneController for the XFML files */
+
 package com.vezumeru.java;
 
+import com.vezumeru.java.controllers.SceneController;
+import com.vezumeru.java.services.MySQLDatabaseHandler;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class Main extends Application  {
+public class Main extends Application {
 
-    /* Fixed dimensions for window */
-    private final int WIDTH  = 480;
-    private final int HEIGHT = 400;
-
-    private final String WINDOW_TITLE = "Web Forum V.1";
+    // Placing this here so other classes can access it
+    public static final MySQLDatabaseHandler databaseHandler = new MySQLDatabaseHandler();
+    public static SceneController sceneController;
 
     @Override
     public void start(Stage stage) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("/com/vezumeru/resources/views/LoginPage.fxml"));
-        Scene scene = new Scene(root, WIDTH, HEIGHT);
-
-        // Makes the resolution fixed (cannot resize)
-        stage.setMaxHeight(HEIGHT);
-        stage.setMaxWidth(WIDTH);
-        stage.setMinHeight(HEIGHT);
-        stage.setMinWidth(WIDTH);
-
-        stage.setTitle(WINDOW_TITLE);
-        stage.setScene(scene);
-        stage.show();
+        // There was too much scene switching.. so just made a controller for that
+        sceneController = new SceneController(stage);
     }
 
     public static void main(String[] args) {

@@ -7,15 +7,11 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.sql.*;
 
-// TODO: 29/10/18 Check if the database is already running
-// TODO CHANGE ALL STATIC TO NOTHING.. SINCE THIS PROGRAM WILL BE CALLED ON, NOT EXECUTED DIRECTLY
-
 public class MySQLDatabaseHandler {
-
-    private static Connection connection;
+    private Connection connection;
 
     // General MySQL Database Methods
-    private static boolean isMySQLRunning() {
+    private boolean isMySQLRunning() {
         // Check if service is running by checking if the port it runs on is open (Socket connects to port 3306 on localhost)
         final String HOST = "127.0.0.1";
         final int PORT = 3306; // MySQL default port
@@ -33,7 +29,7 @@ public class MySQLDatabaseHandler {
             return false;
         }
     }
-    private static void stopOrStartMySQLDatabase(final String COMMAND) {
+    private void stopOrStartMySQLDatabase(final String COMMAND) {
         System.out.println("Starting database..");
 
         boolean MySQLIsRunning = isMySQLRunning();
@@ -50,7 +46,7 @@ public class MySQLDatabaseHandler {
             }
         }
     }
-    private static void handleJDBC(final String DATABASE_NAME, final String USERNAME, final String PASSWORD) throws SQLException {
+    private void handleJDBC(final String DATABASE_NAME, final String USERNAME, final String PASSWORD) throws SQLException {
         final String URL = String.format("jdbc:mysql://localhost:3306/%s?useLegacyDatatimeCode=false&serverTimezone=America/Toronto&allowMultiQueries=true", DATABASE_NAME);
 
         // Register the JDBC Driver and open a connection
@@ -62,33 +58,37 @@ public class MySQLDatabaseHandler {
     }
 
     // User methods
-    private static void addUserToTable(final String USERNAME, final String PASSWORD) throws SQLException {
-        // Doesn't check if the user exists because "INSERT IGNORE" will ignore the query if the user exists?????
-        String SQL = "INSERT INTO userCredentials (username, password) VALUES (?, ?)";
+    public void addUserToTable(final String USERNAME, final String PASSWORD) {
+        try {
+            // Doesn't check if the user exists because "INSERT IGNORE" will ignore the query if the user exists?????
+            String SQL = "INSERT INTO userCredentials (username, password) VALUES (?, ?)";
 
-        PreparedStatement statement = connection.prepareStatement(SQL);
-        statement.setString(1, USERNAME);
-        statement.setString(2, PASSWORD);
+            PreparedStatement statement = connection.prepareStatement(SQL);
+            statement.setString(1, USERNAME);
+            statement.setString(2, PASSWORD);
 
-        statement.execute();
+            statement.execute();
 
-        connection.commit();
-        statement.close();
+            connection.commit();
+            statement.close();
+        } catch (SQLException ex) { System.err.println(ex.getMessage()); }
     }
     // IGNORE FOR NOW.. I'LL IMPLEMENT LATER ON
-    private static void removeUserFromTable(final int ID) throws SQLException {
-        // TODO Make it to where the user can delete their account if they wish refer to this to help
-        // https://stackoverflow.com/questions/8555154/what-is-the-difference-between-drop-and-delete-for-tables
-        String SQL = "DELETE FROM userCredentials WHERE id=?";
-        PreparedStatement statement = connection.prepareStatement(SQL);
+    public void removeUserFromTable(final int ID) throws SQLException {
+        try {
+            // TODO Make it to where the user can delete their account if they wish refer to this to help
+            // https://stackoverflow.com/questions/8555154/what-is-the-difference-between-drop-and-delete-for-tables
+            String SQL = "DELETE FROM userCredentials WHERE id=?";
+            PreparedStatement statement = connection.prepareStatement(SQL);
 
-        statement.setInt(1, ID);
+            statement.setInt(1, ID);
 
-        statement.execute();
-        statement.close();
-        connection.commit();
+            statement.execute();
+            statement.close();
+            connection.commit();
+        } catch (SQLException ex) { System.err.println(ex.getMessage()); }
     }
-    private static String[] getMySQLLoginCredentialsFromUser() {
+    private String[] getMySQLLoginCredentialsFromUser() {
         try {
             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Enter username, press enter, and then enter the password for the database");
@@ -101,29 +101,28 @@ public class MySQLDatabaseHandler {
     }
 
     // Called when an instance of MySQLDatabaseHandler is created
-    public static void main(String[] args)
+    public MySQLDatabaseHandler()
     {
         // Table created with
         // CREATE TABLE userCredentials (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255) PRIMARY KEY, password VARCHAR(255));
-        // I made it to where the id and username have to be unique. I might change that later on. Duplicate usernames?
+        // I made it to where the id and username have to be unique. I might change that later on. Duplicate usernames?+
         try {
             // Starts the MySQL service /etc/init.d/mysql if it's not running
             stopOrStartMySQLDatabase("START");
 
-            String[] usernameAndPassword = getMySQLLoginCredentialsFromUser();
+            // String[] usernameAndPassword = getMySQLLoginCredentialsFromUser();
+            // This is temporary, but bare with me now
+            final String username = "test";
+            final String password = "test";
 
             System.out.println("Trying to connect to the database..");
-            handleJDBC("WebForum", usernameAndPassword[0], usernameAndPassword[1]);
-
-            // Testing to see if I can add a user
-            addUserToTable("uw0tm8", "lmaobruh");
+            // handleJDBC("WebForum", usernameAndPassword[0], usernameAndPassword[1]);
+            handleJDBC("WebForum", username, password);
 
             // Clean-up the environment
-            connection.close();
+            // connection.close();
 
             // stopOrStartMySQLDatabase("STOP");
         } catch (SQLException ex) { System.err.println(ex.getMessage()); }
     }
-
-    MySQLDatabaseHandler () { /* Main will go here when I'm done testing it */ }
 }
